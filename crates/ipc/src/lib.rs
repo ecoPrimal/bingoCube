@@ -31,7 +31,9 @@ pub use negotiation::{
     ServerNegotiationOutcome, negotiate_client, negotiate_server, negotiate_server_outcome,
     select_protocol,
 };
-pub use protocol::{JSONRPC_VERSION, JsonRpcRequest, JsonRpcResponse};
+pub use protocol::{
+    JSONRPC_VERSION, JsonRpcError, JsonRpcRequest, JsonRpcResponse, JsonRpcResponseExt,
+};
 pub use server::{BoundEndpoints, ServeConfig, serve, wait_for_shutdown};
 pub use service::{METHODS, VERSION};
 pub use socket::{

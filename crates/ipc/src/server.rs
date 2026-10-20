@@ -10,7 +10,7 @@ use tokio::sync::watch;
 use crate::dispatch::dispatch;
 use crate::error::IpcError;
 use crate::negotiation::{IpcProtocol, negotiate_server_outcome};
-use crate::protocol::{JsonRpcRequest, JsonRpcResponse};
+use crate::protocol::{JsonRpcRequest, JsonRpcResponse, JsonRpcResponseExt};
 use crate::socket::resolve_socket_dir;
 use crate::state::{SharedState, new_shared_state};
 use crate::transport::{TransportEndpoint, TransportListener, TransportStream};
@@ -253,23 +253,26 @@ async fn process_line(line: &str, state: &SharedState) -> JsonRpcResponse {
         }
     };
 
+    let id = request.id.unwrap_or(serde_json::Value::Null);
+
     if request.jsonrpc != crate::protocol::JSONRPC_VERSION {
         return JsonRpcResponse::invalid_request(
-            request.id,
+            id,
             format!("unsupported jsonrpc version: {}", request.jsonrpc),
         );
     }
 
+    let params = request.params.unwrap_or(serde_json::Value::Null);
     let mut guard = state.write().await;
-    match dispatch(&request.method, request.params, &mut guard) {
-        Ok(result) => JsonRpcResponse::success(request.id, result),
+    match dispatch(&request.method, params, &mut guard) {
+        Ok(result) => JsonRpcResponse::success(id, result),
         Err(IpcError::MethodNotFound(method)) => {
-            JsonRpcResponse::method_not_found(request.id, &method)
+            JsonRpcResponse::method_not_found(id, &method)
         }
         Err(IpcError::InvalidParams(msg) | IpcError::Handler(msg)) => {
-            JsonRpcResponse::invalid_params(request.id, msg)
+            JsonRpcResponse::invalid_params(id, msg)
         }
-        Err(e) => JsonRpcResponse::internal(request.id, e.to_string()),
+        Err(e) => JsonRpcResponse::internal(id, e.to_string()),
     }
 }
 

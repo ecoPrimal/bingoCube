@@ -35,6 +35,9 @@ codegen-units = 1
 strip = true
 
 [workspace.dependencies]
+# Canonical ecosystem types (cellMembrane agglutinated forms)
+cellmembrane-types = { path = "../../gardens/cellMembrane/crates/cellmembrane-types" }
+
 bingocube-core = { path = "crates/core", version = "0.5.0" }
 bingocube-adapters = { path = "crates/adapters", version = "0.5.0" }
 bingocube-nautilus = { path = "crates/nautilus", version = "0.5.0" }

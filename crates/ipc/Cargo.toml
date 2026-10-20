@@ -32,6 +32,7 @@ default = ["tarpc"]
 tarpc = ["dep:tarpc", "dep:futures"]
 
 [dependencies]
+cellmembrane-types.workspace = true
 bingocube-core.workspace = true
 bingocube-nautilus.workspace = true
 blake3.workspace = true
